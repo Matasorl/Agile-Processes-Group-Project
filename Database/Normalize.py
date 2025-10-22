@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+# pip install scikit-learn
+
 # Load CSV
 df = pd.read_csv('movies.csv')
 
