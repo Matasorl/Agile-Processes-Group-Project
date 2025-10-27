@@ -4,17 +4,9 @@ In this script we pre-process our dataset for further use.
 Task: TVMOV-4 Validate and Clean Data
 Subtasks:
 > Normalize columns with numerical values (votes, rating, runtime)
+> Dealing with Missing values
 > Drop rows based on missing value percentage
 > Drop column(s) based on missing value percentage
-> Dealing with Missing values
-
-
-Notes:
-We want to visualize:
-1.  Genre vs Rating Distribution
-2.  Rating vs Runtime Distribution
-3.  Director & Stars Rating Correlation
-
 """
 
 import numpy as np
