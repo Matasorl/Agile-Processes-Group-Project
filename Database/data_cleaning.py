@@ -1,11 +1,11 @@
 """
 In this script we pre-process our dataset for further use.
 
-Tasks:
-
-> Normalize columns with numerical values
-> Drop rows based on missing percentage
-> Drop column(s) based on missing percentage
+Task: TVMOV-4 Validate and Clean Data
+Subtasks:
+> Normalize columns with numerical values (votes, rating, runtime)
+> Drop rows based on missing value percentage
+> Drop column(s) based on missing value percentage
 > Dealing with Missing values
 
 
@@ -34,11 +34,16 @@ def clean_data(file):
 
     # votes column
     df['votes'] = df['votes'].astype(str).str.replace(',', '')
-    df['votes'] = pd.to_numeric(df['votes'], errors='coerce')  # invalid parsing will be set as NaN.
+    df['votes'] = pd.to_numeric(df['votes'], errors='coerce')  # convert to numeric; invalid parsing will be set as NaN.
     print(df['votes'])
 
     # rating column
     df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
+
+    # runtime column
+    df['runtime'] = df['runtime'].astype(str).str.replace('min', '').str.strip()
+    df['runtime'] = pd.to_numeric(df['runtime'], errors='coerce')
+    print(df['runtime'])
 
 
     ########################################################
