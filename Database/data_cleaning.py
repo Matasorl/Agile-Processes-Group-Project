@@ -3,10 +3,8 @@ In this script we pre-process our dataset for further use.
 
 Task: TVMOV-4 Validate and Clean Data
 Subtasks:
-> Normalize columns with numerical values (votes, rating, runtime)
 > Dealing with Missing values
 > Drop rows based on missing value percentage
-> Drop column(s) based on missing value percentage
 """
 
 import numpy as np
@@ -17,25 +15,6 @@ def clean_data(file):
 
     # Number of columns
     num_columns = df.shape[1]
-
-    ##########################################################################################
-    # Normalize columns with existing NON-NUMERICAL values in a numerical column
-    ##########################################################################################
-    # get list of columns
-    print(df.columns)
-
-    # votes column
-    df['votes'] = df['votes'].astype(str).str.replace(',', '')
-    df['votes'] = pd.to_numeric(df['votes'], errors='coerce')  # convert to numeric; invalid parsing will be set as NaN.
-    print(df['votes'])
-
-    # rating column
-    df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
-
-    # runtime column
-    df['runtime'] = df['runtime'].astype(str).str.replace('min', '').str.strip()
-    df['runtime'] = pd.to_numeric(df['runtime'], errors='coerce')
-    print(df['runtime'])
 
 
     ########################################################
@@ -101,7 +80,7 @@ def clean_data(file):
 
 
 def main():
-    dataset = "imdb-original.csv"
+    dataset = "movies-column-dropped.csv"
     clean_data(dataset)
 
 
