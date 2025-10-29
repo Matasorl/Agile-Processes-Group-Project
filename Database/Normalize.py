@@ -10,7 +10,7 @@ df = pd.read_csv('movies.csv')
 df['votes'] = pd.to_numeric(df['votes'].str.replace(',', '', regex=False), errors='coerce')
 
 # Extract numeric value from runtime (e.g., "60 min" -> 60)
-df['runtime'] = df['runtime'].str.extract('(\d+)').astype(float)
+df['runtime'] = df['runtime'].str.extract(r'(\d+)').astype(float)
 
 
 
