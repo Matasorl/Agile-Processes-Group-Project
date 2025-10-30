@@ -12,8 +12,6 @@ df['votes'] = pd.to_numeric(df['votes'].str.replace(',', '', regex=False), error
 # Extract numeric value from runtime (e.g., "60 min" -> 60)
 df['runtime'] = df['runtime'].str.extract('(\d+)').astype(float)
 
-
-
 # Columns to normalize
 cols_to_normalize = ['rating', 'votes', 'runtime']
 
