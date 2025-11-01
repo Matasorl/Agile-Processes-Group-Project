@@ -6,6 +6,9 @@ c = conn.cursor()
 
 # Select movies with rating > 8
 c.execute("SELECT movie, rating FROM movies WHERE rating > 8")
+# sample query for testing new code after cleaning
+c.execute("SELECT movie, rating FROM movies LIMIT 10")
+
 for row in c.fetchall():
     print(row)
 
