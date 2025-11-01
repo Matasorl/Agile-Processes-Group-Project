@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 
 # load the cleaned csv
-df = pd.read_csv("movies-cleaned.csv")
+df = pd.read_csv("movies_category_cleaned.csv")
 
 # create sqlite database
 conn = sqlite3.connect("movies.db")
