@@ -1,6 +1,6 @@
 # This script performs ML analyses and integrates LLM OpenAI API
 
-import json
+
 import sqlite3
 import pandas as pd
 from sklearn.linear_model import LinearRegression
