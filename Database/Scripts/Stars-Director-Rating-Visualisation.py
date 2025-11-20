@@ -1,12 +1,12 @@
-# director_star_analysis.py
-# This script analyzes how directors and individual stars affect normalized movie ratings and popularity
 
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 # -------------------------------
-# Step 1. Load data from database
+# Step 1. Load data
 # -------------------------------
 conn = sqlite3.connect("movies.db")
 df = pd.read_sql_query("SELECT movie, director, stars, rating FROM movies", conn)
@@ -19,136 +19,137 @@ top_directors = df['director'].value_counts().head(50).index
 df_directors = df[df['director'].isin(top_directors)]
 
 # -------------------------------
-# Step 3. Select top 50 starts
+# Step 3. Select top 50 stars
 # -------------------------------
-# Split on commas and explode into separate rows
 df_stars = df.copy()
 df_stars['stars'] = df_stars['stars'].str.split(',')
 df_stars = df_stars.explode('stars')
 df_stars['stars'] = df_stars['stars'].str.strip()
 
-# Select top 50 most frequent individual stars
 top_stars = df_stars['stars'].value_counts().head(50).index
 df_stars = df_stars[df_stars['stars'].isin(top_stars)]
 
 # -------------------------------
-# Step 4. Aggregate average normalized rating
+# Step 4. Aggregations
 # -------------------------------
 avg_rating_director = df_directors.groupby('director')['rating'].mean().sort_values(ascending=False)
 avg_rating_star = df_stars.groupby('stars')['rating'].mean().sort_values(ascending=False)
 
-
-# Count number of movies per director and star
-
-# Number of movies each top director has
 movies_per_director = df_directors.groupby('director').size().sort_values(ascending=False)
-
-# Number of movies each top star has
 movies_per_star = df_stars.groupby('stars').size().sort_values(ascending=False)
 
 # -------------------------------
-# Step 5. Visualize graphs
+# Step 5. Visualizations 
 # -------------------------------
 
-# Combined: Directors visualizations
-# One figure with 3 graphs
+# -------------------------------
+# Combined Director Plots
+# -------------------------------
+# Boxplot: Shows rating distribution per director (median, spread, consistency)
+# Scatter: Shows relationship between number of movies (X) and average rating (Y)
 
-fig, axes = plt.subplots(3, 1, figsize=(12, 18))
+fig, axes = plt.subplots(2, 1, figsize=(16, 12))
 
-# 1. Average rating per director
-avg_rating_director.plot(kind='bar', color='steelblue', ax=axes[0])
-axes[0].set_title("Average Normalized Rating per Director (Top 50)")
-axes[0].set_ylabel("Average Normalized Rating")
+# 1. Boxplot of ratings per director
+sns.boxplot(
+    data=df_directors,
+    x="director",
+    y="rating",
+    showfliers=False,
+    ax=axes[0]
+)
+plt.setp(axes[0].get_xticklabels(), rotation=90)
+axes[0].set_title("Director Rating Distributions (Box Plot)")
+axes[0].set_ylabel("Normalized Rating")
 axes[0].set_xlabel("Director")
-axes[0].tick_params(axis='x', rotation=90)
 
-# 2. Number of movies per director
-movies_per_director.plot(kind='bar', color='skyblue', ax=axes[1])
-axes[1].set_title("Number of Movies per Director (Top 50)")
-axes[1].set_ylabel("Number of Movies")
-axes[1].set_xlabel("Director")
-axes[1].tick_params(axis='x', rotation=90)
-
-# 3. Scatter: average rating vs number of movies
-axes[2].scatter(movies_per_director, avg_rating_director, color='steelblue', alpha=0.6)
-axes[2].set_title("Director: Average Rating vs Number of Movies")
-axes[2].set_xlabel("Number of Movies")
-axes[2].set_ylabel("Average Normalized Rating")
-axes[2].grid(True, linestyle='--', linewidth=0.5)
+# 2. Scatter plot of avg rating vs movie count
+axes[1].scatter(
+    movies_per_director,
+    avg_rating_director,
+    alpha=0.7,
+    color="royalblue"
+)
+axes[1].set_title("Directors: Avg Rating vs Movie Count (Scatter Plot)")
+axes[1].set_xlabel("Number of Movies")
+axes[1].set_ylabel("Average Rating")
+axes[1].grid(True, linestyle="--", alpha=0.5)
 
 plt.tight_layout()
-plt.savefig("director_combined_visualizations.png", dpi=300)
-plt.close()
-
-
-# Combined: Star visualizations
-# One figure with 3 graphs
-
-fig, axes = plt.subplots(3, 1, figsize=(12, 18))
-
-# 1. Average rating per star
-avg_rating_star.plot(kind='bar', color='darkorange', ax=axes[0])
-axes[0].set_title("Average Normalized Rating per Star (Top 50)")
-axes[0].set_ylabel("Average Normalized Rating")
-axes[0].set_xlabel("Star")
-axes[0].tick_params(axis='x', rotation=90)
-
-# 2. Number of movies per star
-movies_per_star.plot(kind='bar', color='orange', ax=axes[1])
-axes[1].set_title("Number of Movies per Star (Top 50)")
-axes[1].set_ylabel("Number of Movies")
-axes[1].set_xlabel("Star")
-axes[1].tick_params(axis='x', rotation=90)
-
-# 3. Scatter: average rating vs number of movies
-axes[2].scatter(movies_per_star, avg_rating_star, color='darkorange', alpha=0.6)
-axes[2].set_title("Star: Average Rating vs Number of Movies")
-axes[2].set_xlabel("Number of Movies")
-axes[2].set_ylabel("Average Normalized Rating")
-axes[2].grid(True, linestyle='--', linewidth=0.5)
-
-plt.tight_layout()
-plt.savefig("star_combined_visualizations.png", dpi=300)
+plt.savefig("directors_combined.png")
 plt.close()
 
 
 # -------------------------------
-# Step 6. Generate key insights
+# Combined Star Plots
+# -------------------------------
+# Boxplot: Shows rating distribution per star (median, spread, consistency)
+# Scatter: Shows relationship between number of movies (X) and average rating (Y)
+
+fig, axes = plt.subplots(2, 1, figsize=(16, 12))
+
+# 1. Boxplot of ratings per star
+sns.boxplot(
+    data=df_stars,
+    x="stars",
+    y="rating",
+    showfliers=False,
+    ax=axes[0]
+)
+plt.setp(axes[0].get_xticklabels(), rotation=90) 
+axes[0].set_title("Star Rating Distributions (Box Plot)")
+axes[0].set_ylabel("Normalized Rating")
+axes[0].set_xlabel("Star")
+
+# 2. Scatter plot of avg rating vs movie count
+axes[1].scatter(
+    movies_per_star,
+    avg_rating_star,
+    alpha=0.7,
+    color="darkorange"
+)
+axes[1].set_title("Stars: Avg Rating vs Movie Count (Scatter Plot)")
+axes[1].set_xlabel("Number of Movies")
+axes[1].set_ylabel("Average Rating")
+axes[1].grid(True, linestyle="--", alpha=0.5)
+
+plt.tight_layout()
+plt.savefig("stars_combined.png")
+plt.close()
+
+
+
+
+
+
+# -------------------------------
+# Step 6. Insights
 # -------------------------------
 top_director = avg_rating_director.head(1)
 top_star = avg_rating_star.head(1)
 
 print("=== Insights ===")
 print(f"Highest-rated director: {top_director.index[0]} with average normalized rating {top_director.values[0]:.3f}")
-print(f"Highest-rated individual star: {top_star.index[0]} with average normalized rating {top_star.values[0]:.3f}")
+print(f"Highest-rated star: {top_star.index[0]} with average normalized rating {top_star.values[0]:.3f}")
+
+print("\nNew visualizations saved:")
+print("- directors_combined.png  # Boxplot + Scatter Plot for directors")
+print("- stars_combined.png      # Boxplot + Scatter Plot for stars")
 
 
-print("\nVisualizations saved as:")
-print("- director_combined_visualizations.png")
-print("- star_combined_visualizations.png")
 
 # -------------------------------
-# Step 7. Save combined director and star ratings to CSV (with movie counts)
+# Step 7. Save CSV
 # -------------------------------
-
-# Reset indexes to turn Series into DataFrames
 df_directors_avg = avg_rating_director.reset_index()
 df_directors_avg.columns = ['director', 'avg_rating_director']
+df_directors_avg['movies_director'] = movies_per_director.values
 
 df_stars_avg = avg_rating_star.reset_index()
 df_stars_avg.columns = ['star', 'avg_rating_star']
-
-# Add number of movies of each star and director
-df_directors_avg['movies_director'] = movies_per_director.values
 df_stars_avg['movies_star'] = movies_per_star.values
 
-# Concatenate side by side
 combined_df = pd.concat([df_directors_avg, df_stars_avg], axis=1)
-
-# Save to CSV
 combined_df.to_csv("avg_ratings_directors_stars.csv", index=False)
 
-print("\nCombined CSV saved as:")
-print("- avg_ratings_directors_stars.csv")
-
-
+print("\nCombined CSV saved as avg_ratings_directors_stars.csv")
