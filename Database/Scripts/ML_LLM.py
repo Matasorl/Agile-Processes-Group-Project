@@ -30,7 +30,58 @@ def analyze_stars_rating(df):
     pass
 
 def analyze_director_rating(df):
-    pass
+    try:
+        # Make a copy of the dataframe to avoid modifying the original data
+        df_copy = df.copy()
+
+        # Calculate the average rating for each director
+        # This groups the dataframe by the "director" column and computes the mean of the "rating" column
+        # Sorting descending so the highest-rated directors are first
+        director_avg = (
+            df_copy.groupby("director")["rating"]
+            .mean()
+            .sort_values(ascending=False)
+        )
+
+        # Encode director names as numeric values for regression
+        # LabelEncoder converts categorical text labels into numbers (0,1,2,…)
+        # This allows Linear Regression to use the director as an input feature
+        label_encoder = LabelEncoder()
+        df_copy["director_encoded"] = label_encoder.fit_transform(df_copy["director"])
+
+        # Define the input (X) and target (y) for regression
+        X = df_copy[["director_encoded"]]  # Encoded director names as input
+        y = df_copy["rating"]              # Movie ratings as target
+
+        # Create and fit a simple linear regression model
+        # This will try to find a linear relationship between director encoding and movie rating
+        model = LinearRegression()
+        model.fit(X, y)
+
+        # Extract the model's coefficient and intercept
+        # Coefficient indicates the "slope" (how much rating changes per unit of encoded director)
+        # Intercept indicates the baseline rating when director_encoded=0
+        coefficient = float(model.coef_[0])
+        intercept = float(model.intercept_)
+
+        # Return a dictionary containing key insights:
+        return {
+            "coefficient": coefficient,                       # Trend of ratings vs. director encoding
+            "intercept": intercept,                           # Baseline rating
+            "top_directors": director_avg.head(10).to_dict(),  # Top 10 directors by average rating
+            "bottom_directors": director_avg.tail(10).to_dict(), # Bottom 10 directors by average rating
+            "num_directors": len(director_avg),              # Total number of unique directors
+            "avg_rating_overall": float(df_copy["rating"].mean())  # Overall average movie rating
+        }
+
+    except Exception as e:
+        # Catch any errors during processing and return the error message and traceback
+        return {
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }
+
+
 
 def extract_all_insights(df):
     return {
