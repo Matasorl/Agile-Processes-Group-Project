@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # load the CSV
-df = pd.read_csv("movies_category_cleaned.csv")
+df = pd.read_csv("Database/Data/DB_Related/movies_category_cleaned.csv")
 
 # keep only rows that have both runtime and rating
 df = df.dropna(subset=["runtime", "rating"])
@@ -23,9 +23,9 @@ avg_by_runtime_2dp["avg_rating"] = avg_by_runtime_2dp["avg_rating"].round(2)
 
 # save to a CSV file
 # full version
-avg_by_runtime.to_csv("avg_rating_by_runtime.csv", index=False)
+avg_by_runtime.to_csv("Database/Data/avg_rating_by_runtime.csv", index=False)
 # 2 decimal points version
-avg_by_runtime_2dp.to_csv("avg_rating_by_runtime_2dp.csv", index=False)
+avg_by_runtime_2dp.to_csv("Database/Data/avg_rating_by_runtime_2dp.csv", index=False)
 
 # both can be used. full version is better for further analysis. 2 decimal points version is for reports (clean)
 

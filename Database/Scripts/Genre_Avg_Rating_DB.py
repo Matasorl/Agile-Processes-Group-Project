@@ -61,14 +61,14 @@ def plot_barh(agg: pd.DataFrame, genre_col: str, rating_col_name: str, out_png: 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--db", default="./movies.db")
+    ap.add_argument("--db", default="Database/movies.db")
     ap.add_argument("--table", default="movies")
     ap.add_argument("--genre-col", default="genre")
     ap.add_argument("--rating-col", default="rating")
     ap.add_argument("--delimiter", default=",")
     ap.add_argument("--min-count", type=int, default=1)
-    ap.add_argument("--out-csv", default="./genre_avg_ratings_from_db.csv")
-    ap.add_argument("--out-png", default="./genre_avg_ratings_from_db.png")
+    ap.add_argument("--out-csv", default="Database/Data/genre_avg_ratings_from_db.csv")
+    ap.add_argument("--out-png", default="Database/Images/genre_avg_ratings_from_db.png")
     ap.add_argument("--title", default="Average Rating per Genre (from SQLite)")
     args = ap.parse_args()
 
