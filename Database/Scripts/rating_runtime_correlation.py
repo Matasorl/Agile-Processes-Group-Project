@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # load data from database and select relevant columns
-conn = sqlite3.connect("movies.db")
+conn = sqlite3.connect("Database/movies.db")
 df = pd.read_sql_query("SELECT runtime, rating FROM movies", conn)
 
 # convert to numeric
@@ -22,7 +22,7 @@ avg_by_runtime = (
       .sort_values("runtime")
 )
 
-avg_by_runtime.to_csv("avg_rating_by_runtime.csv", index=False)
+avg_by_runtime.to_csv("Database/Data/avg_rating_by_runtime.csv", index=False)
 
 # Correlations (Pearson for linear, Spearman for monotonic)
 pearson_r  = df[["runtime", "rating"]].corr(method="pearson").loc["runtime", "rating"]
@@ -34,7 +34,7 @@ corr_df = pd.DataFrame({
 })
 # r^2 for Pearson r correlation
 corr_df["r_squared (pearson)"] = [pearson_r ** 2, None]
-corr_df.round(4).to_csv("runtime_rating_correlations.csv", index=False)
+corr_df.round(4).to_csv("Database/Data/runtime_rating_correlations.csv", index=False)
 
 # bar chart of correlations
 plt.figure(figsize=(6, 5))
@@ -69,11 +69,11 @@ plt.ylabel("Average Rating (0–1)")
 plt.xlim(0, 1)
 plt.ylim(0, 1)
 plt.tight_layout()
-plt.savefig("avg_rating_by_runtime.png", dpi=150)
+plt.savefig("Database/Images/avg_rating_by_runtime.png", dpi=150)
 plt.show()
 
 # Save the table (with midpoints) for your report
-# avg_by_bin.assign(runtime_mid=bin_mid).to_csv("avg_rating_by_runtime_bins.csv", index=False)
+# avg_by_bin.assign(runtime_mid=bin_mid).to_csv("Database/Data/avg_rating_by_runtime_bins.csv", index=False)
 
 # scatterplot with sample
 plot_df = df
@@ -95,7 +95,7 @@ if len(x) > 1:
     plt.xlim(0, 1)
     plt.ylim(0, 1)
     plt.tight_layout()
-    plt.savefig("runtime_rating_scatterplot.png", dpi=150)
+    plt.savefig("Database/Images/runtime_rating_scatterplot.png", dpi=150)
     plt.show()
 
 

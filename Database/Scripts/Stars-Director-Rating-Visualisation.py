@@ -8,7 +8,7 @@ import numpy as np
 # -------------------------------
 # Step 1. Load data
 # -------------------------------
-conn = sqlite3.connect("movies.db")
+conn = sqlite3.connect("Database/movies.db")
 df = pd.read_sql_query("SELECT movie, director, stars, rating FROM movies", conn)
 conn.close()
 
@@ -76,7 +76,7 @@ axes[1].set_ylabel("Average Rating")
 axes[1].grid(True, linestyle="--", alpha=0.5)
 
 plt.tight_layout()
-plt.savefig("directors_combined.png")
+plt.savefig("Database/Images/TVMOV-43/directors_combined.png")
 plt.close()
 
 
@@ -114,7 +114,7 @@ axes[1].set_ylabel("Average Rating")
 axes[1].grid(True, linestyle="--", alpha=0.5)
 
 plt.tight_layout()
-plt.savefig("stars_combined.png")
+plt.savefig("Database/Images/TVMOV-43/stars_combined.png")
 plt.close()
 
 
@@ -150,6 +150,6 @@ df_stars_avg.columns = ['star', 'avg_rating_star']
 df_stars_avg['movies_star'] = movies_per_star.values
 
 combined_df = pd.concat([df_directors_avg, df_stars_avg], axis=1)
-combined_df.to_csv("avg_ratings_directors_stars.csv", index=False)
+combined_df.to_csv("Database/Data/avg_ratings_directors_stars.csv", index=False)
 
 print("\nCombined CSV saved as avg_ratings_directors_stars.csv")
