@@ -1,7 +1,15 @@
 import sqlite3
+import os
+
+# get the directory where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# construct the path to the database file (2 levels up from script location)
+db_path = os.path.join(script_dir, "..", "..", "movies.db")
+db_path = os.path.abspath(db_path)  # Normalize the path
 
 # Connect to the local database
-conn = sqlite3.connect("movies.db")
+conn = sqlite3.connect(db_path)
 c = conn.cursor()
 
 # Select movies with rating > 8
