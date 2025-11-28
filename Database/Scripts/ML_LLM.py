@@ -7,6 +7,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
 from openai import OpenAI
 import traceback
+import os
 
 
 #############################################
@@ -14,17 +15,120 @@ import traceback
 #############################################
 
 def load_movies_from_db(db_path='movies.db'):
-    conn = sqlite3.connect(db_path)
-    df = pd.read_sql_query('SELECT * FROM movies', conn)
-    conn.close()
-    return df
+    """
+    Load movies data from SQLite database.
+    If database doesn't exist or table is missing, loads from CSV as fallback.
+    """
+    # Try to find the database file
+    if not os.path.exists(db_path):
+        # Try alternative paths
+        alternative_paths = [
+            'Database/Scripts/movies.db',
+            '../movies.db',
+            'Database/movies.db'
+        ]
+        
+        for alt_path in alternative_paths:
+            if os.path.exists(alt_path):
+                db_path = alt_path
+                break
+        else:
+            print(f"Warning: Database file not found at {db_path}")
+            print("Attempting to load from CSV instead...")
+            return load_movies_from_csv()
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        
+        # Check if 'movies' table exists
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='movies'")
+        if cursor.fetchone() is None:
+            print("Warning: 'movies' table not found in database")
+            print("Attempting to load from CSV instead...")
+            conn.close()
+            return load_movies_from_csv()
+        
+        df = pd.read_sql_query('SELECT * FROM movies', conn)
+        conn.close()
+        print(f"Successfully loaded {len(df)} movies from database")
+        return df
+        
+    except Exception as e:
+        print(f"Error loading from database: {e}")
+        print("Attempting to load from CSV instead...")
+        return load_movies_from_csv()
+
+
+def load_movies_from_csv(csv_path='movies_category_cleaned.csv'):
+    """
+    Fallback function to load movies from CSV file.
+    """
+    # Try to find the CSV file
+    if not os.path.exists(csv_path):
+        alternative_paths = [
+            'Database/movies_category_cleaned.csv',
+            'Database/Data/movies_category_cleaned.csv',
+            'movies-cleaned.csv',
+            'Database/movies-cleaned.csv'
+        ]
+        
+        for alt_path in alternative_paths:
+            if os.path.exists(alt_path):
+                csv_path = alt_path
+                break
+        else:
+            raise FileNotFoundError(
+                f"Could not find movie data file. Tried:\n"
+                f"- {csv_path}\n" + 
+                "\n".join(f"- {p}" for p in alternative_paths)
+            )
+    
+    try:
+        df = pd.read_csv(csv_path)
+        print(f"Successfully loaded {len(df)} movies from CSV: {csv_path}")
+        return df
+    except Exception as e:
+        raise Exception(f"Error loading CSV file {csv_path}: {e}")
 
 #############################################
 # Machine Learning analysis tasks
 #############################################
 
 def analyze_runtime_rating(df):
-    pass
+    try:
+        df_copy = df.copy()
+
+        runtime_avg = (
+            df_copy.groupby("runtime")["rating"].mean().sort_values(ascending=False)
+        )
+
+        label_encoder = LabelEncoder()
+        df_copy["runtime_encoded"] = label_encoder.fit_transform(df_copy["runtime"])
+
+        X = df_copy[["runtime_encoded"]]
+        y = df_copy["rating"]
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        coefficient = float(model.coef_[0])
+        intercept = float(model.intercept_)
+
+        return {
+            "coefficient": coefficient,
+            "intercept": intercept,
+            "top_runtimes": runtime_avg.head(10).to_dict(),
+            "bottom_runtimes": runtime_avg.tail(10).to_dict(),
+            "num_runtimes": len(runtime_avg),
+            "avg_rating_overall": float(df_copy["rating"].mean())
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }
+
 
 def analyze_stars_rating(df):
     pass
