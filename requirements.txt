@@ -1,8 +1,8 @@
 pytest
 pandas
+scikit-learn
+openai
 numpy
 matplotlib
 seaborn
-scikit-learn
-openai
 python-dotenv

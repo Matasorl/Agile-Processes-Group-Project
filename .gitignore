@@ -1,9 +1,15 @@
 .DS_Store
 .idea/
-.gitignore
+
 venv/
+ENV/
+env/
+
 __pycache__/
 .pytest_cache/
 *.pyc
+
 .env
+.env.local
+
 

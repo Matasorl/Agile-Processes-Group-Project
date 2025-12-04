@@ -104,6 +104,7 @@ def load_movies_from_csv(csv_path='movies_category_cleaned.csv'):
     except Exception as e:
         raise Exception(f"Error loading CSV file {csv_path}: {e}")
 
+
 #############################################
 # Machine Learning analysis tasks
 #############################################
@@ -165,7 +166,7 @@ def analyze_stars_rating(df):
 
         # Convert ratings into categories (classification: High vs Low)
         # Example threshold: above/below global average
-        avg_rating_overall = df_copy["rating"].mean() # Overall average movie rating
+        avg_rating_overall = df_copy["rating"].mean()  # Overall average movie rating
         rating_class = (grouped["rating"].mean() >= avg_rating_overall).astype(int)
 
         # Create DataFrame to merge data per actor
@@ -184,7 +185,6 @@ def analyze_stars_rating(df):
         # This balances rating with reliability
         # For example: Contribution to dataset rating: 0.002%
         actor_summary["weighted_score"] = (actor_summary["avg_rating"] * actor_summary["relative_freq"])
-
 
         # fair_actors_sorted = fair_actors.sort_values(by=["avg_rating", "num_movies"], ascending=[False, False])
         # Sort by num_movies (descending)
@@ -278,7 +278,8 @@ def analyze_stars_rating(df):
         sns.barplot(x="avg_rating", y="stars_list", data=top_actors_df, hue="above_avg", dodge=False,
                     palette={True: "#1f77b4", False: "#4fa8dc"})
         # Add vertical line for global average rating
-        plt.axvline(avg_rating_overall, color="black", linestyle="--", linewidth=2, label=f"Global Avg: {avg_rating_overall:.2f}")
+        plt.axvline(avg_rating_overall, color="black", linestyle="--", linewidth=2,
+                    label=f"Global Avg: {avg_rating_overall:.2f}")
         plt.title("Top 50 Actors by Average Rating (Above vs Below Global Average)", fontsize=14, fontweight='bold')
         plt.xlabel("Average Rating")
         plt.ylabel("Actor")
@@ -290,17 +291,19 @@ def analyze_stars_rating(df):
 
         # Scatterplot: Number of Movies vs Average Rating
         plt.figure(figsize=(10, 6))
-        sns.scatterplot(x="num_movies", y="avg_rating", data=actor_summary_sorted, hue="num_movies", size="num_movies", palette="Blues", sizes=(20, 200))  # hue-color intensity by number of movies, # larger points for more movies
+        sns.scatterplot(x="num_movies", y="avg_rating", data=actor_summary_sorted, hue="num_movies", size="num_movies",
+                        palette="Blues",
+                        sizes=(20, 200))  # hue-color intensity by number of movies, # larger points for more movies
         plt.title("Actor Ratings vs Number of Movies", fontsize=14, fontweight="bold")
         # Add horizontal line for global average rating
-        plt.axhline(avg_rating_overall, color="black", linestyle="--", linewidth=2, label=f"Global Avg: {avg_rating_overall:.2f}")
+        plt.axhline(avg_rating_overall, color="black", linestyle="--", linewidth=2,
+                    label=f"Global Avg: {avg_rating_overall:.2f}")
         plt.xlabel("Number of Movies")
         plt.ylabel("Average Rating")
         plt.legend(title="Global Average", loc="lower right")
         plt.tight_layout()
         # Save scatterplot into Images folder
         plt.savefig("../Images/Actor Ratings vs Number of Movies(Scatterplot).png", dpi=300)
-
 
         # plt.show()
         print("Finishing analyze_stars_rating and returning insight.")
@@ -388,6 +391,7 @@ def extract_all_insights(df):
         "director_rating": analyze_director_rating(df)
     }
 
+
 #############################################
 # LLM client (OpenAI)
 #############################################
@@ -409,18 +413,18 @@ def call_llm(insights: dict, audience_preferences=None):
 
     prompt = f"""
     You are an AI data analyst for a movie intelligence platform.
-    
+
     STAKEHOLDERS:
     - General Audience: individuals wants easy explanations and movie/TV recommendations(genre, runtime, stars, directors, popularity).
     - Streaming Platforms: companies that use insights to improve recommendation systems.
     - Industry Stakeholders:  need data-driven behaviour patterns, correlations, and predictions for content success.
-    
+
     Analysis Results:
     - Runtime vs Rating: {runtime_insights}
     - Stars vs Rating: {stars_insights}
     - Directors vs Rating: {director_insights}
     {audience_context}
-    
+
     TASK: 
     1. For General Audience: Provide clear, user-friendly recommendations of movies/TV shows that align with preferences.
     2. For Streaming Platforms: Suggest how these insights can improve recommendation systems.
@@ -436,6 +440,7 @@ def call_llm(insights: dict, audience_preferences=None):
         ]
     )
     return response.choices[0].message.content
+
 
 if __name__ == "__main__":
     df = load_movies_from_db()
