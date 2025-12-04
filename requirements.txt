@@ -1,0 +1,8 @@
+pytest
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+openai
+python-dotenv
