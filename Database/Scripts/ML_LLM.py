@@ -186,7 +186,6 @@ def analyze_stars_rating(df):
         actor_summary["weighted_score"] = (actor_summary["avg_rating"] * actor_summary["relative_freq"])
 
 
-
         # fair_actors_sorted = fair_actors.sort_values(by=["avg_rating", "num_movies"], ascending=[False, False])
         # Sort by num_movies (descending)
         actor_summary_sorted = actor_summary.sort_values(by=["num_movies", "avg_rating"], ascending=False)
